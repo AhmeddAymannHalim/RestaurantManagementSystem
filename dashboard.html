@@ -1,0 +1,484 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- PERFECT HEADER: User Left | Logo Center | Lang Right -->
+    <header>
+        <div class="header-flex">
+            <!-- LEFT: User Button + Dropdown -->
+            <div class="header-left">
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span id="userName" class="user-name-text"></span>
+                    <div class="user-menu">
+                        <button class="btn-user-menu" onclick="toggleUserMenu(event)">
+                            <span id="userInitial" class="user-initial">A</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div id="userDropdown" class="user-dropdown">
+                            <div class="dropdown-header">
+                                <div class="dropdown-avatar">
+                                    <span id="dropdownInitial">A</span>
+                                </div>
+                                <div class="dropdown-user-info">
+                                    <div id="dropdownUserName" class="dropdown-name">User Name</div>
+                                    <div id="dropdownUserRole" class="dropdown-role">Admin</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <button onclick="goToHome()" class="dropdown-item">
+                                <span data-i18n="home">🏠 Home</span>
+                            </button>
+                            <button onclick="goToSwagger()" class="dropdown-item">
+                                <span data-i18n="apiDocs">📚 API Docs</span>
+                            </button>
+                            <button onclick="showSettingsTab()" class="dropdown-item" id="settingsMenuBtn" style="display: none;">
+                                <span data-i18n="settings">⚙️ Settings</span>
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button onclick="showChangePasswordModal()" class="dropdown-item">
+                                <span data-i18n="changePassword">🔑 Change Password</span>
+                            </button>
+                            <button onclick="showEditProfileModal()" class="dropdown-item">
+                                <span data-i18n="editProfile">👤 Edit Profile</span>
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button onclick="logout()" class="dropdown-item dropdown-logout">
+                                <span data-i18n="logout">🚪 Logout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER: Logo -->
+            <div class="header-center">
+                <h1 data-i18n="appTitle">🍽️ Restaurant Management System</h1>
+            </div>
+
+            <!-- RIGHT: Language Switcher -->
+            <div class="header-right">
+                <div class="language-switcher">
+                    <button onclick="switchLanguage('en')" class="lang-btn active" id="langEN">EN</button>
+                    <button onclick="switchLanguage('ar')" class="lang-btn" id="langAR">عربي</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Login Section -->
+        <div id="loginSection" class="section">
+            <div class="card">
+                <h2 data-i18n="loginTitle">Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label data-i18n="username">Username</label>
+                        <input type="text" id="loginUsername" placeholder="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="password">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Admin@123" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span data-i18n="loginBtn">LOGIN</span>
+                    </button>
+                </form>
+                <p class="toggle-form">
+                    <a href="#" onclick="showForgotPassword(); return false;" class="link">
+                        <span data-i18n="forgotPassword">Forgot Password?</span>
+                    </a>
+                </p>
+                <p class="toggle-form">
+                    <span data-i18n="noAccount">Don't have an account?</span>
+                    <a href="#" onclick="showRegister(); return false;" class="link">
+                        <span data-i18n="registerHere">Register here</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Register Section -->
+        <div id="registerSection" class="section" style="display: none;">
+            <div class="card">
+                <h2 data-i18n="registerTitle">Register</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label data-i18n="username">Username</label>
+                        <input type="text" id="regUsername" required data-i18n-placeholder="enterUsername">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="email">Email</label>
+                        <input type="email" id="regEmail" required data-i18n-placeholder="enterEmail">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="password">Password</label>
+                        <input type="password" id="regPassword" required data-i18n-placeholder="enterPassword">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="fullName">Full Name</label>
+                        <input type="text" id="regFullName" required data-i18n-placeholder="enterFullName">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="role">Role</label>
+                        <select id="regRole">
+                            <option value="Admin">Admin</option>
+                            <option value="Waiter" selected>Waiter</option>
+                            <option value="Kitchen">Kitchen</option>
+                            <option value="Cashier">Cashier</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span data-i18n="registerBtn">REGISTER</span>
+                    </button>
+                </form>
+                <p class="toggle-form">
+                    <span data-i18n="haveAccount">Already have an account?</span>
+                    <a href="#" onclick="showLogin(); return false;" class="link">
+                        <span data-i18n="loginHere">Login here</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Forgot Password Section -->
+        <div id="forgotPasswordSection" class="section" style="display: none;">
+            <div class="card">
+                <h2 data-i18n="forgotPasswordTitle">Forgot Password</h2>
+
+                <div id="forgotStep1">
+                    <form id="forgotPasswordForm">
+                        <div class="form-group">
+                            <label data-i18n="email">Email Address</label>
+                            <input type="email" id="forgotEmail" required data-i18n-placeholder="enterEmail">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span data-i18n="sendOTP">SEND OTP</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div id="forgotStep2" style="display: none;">
+                    <form id="resetPasswordForm">
+                        <div class="form-group">
+                            <label data-i18n="otpCode">OTP Code</label>
+                            <input type="text" id="otpCode" maxlength="6" required>
+                        </div>
+
+                        <div style="text-align: center; margin: 20px 0;">
+                            <button type="button" id="resendOtpBtn" onclick="resendOTP()"
+                                    style="background: transparent; color: #a78bfa; border: none; cursor: pointer; text-decoration: none; font-size: 15px; font-weight: 500; transition: all 0.3s; padding: 8px 16px;">
+                                Resend OTP (60s)
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label data-i18n="newPassword">New Password</label>
+                            <input type="password" id="newPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <span data-i18n="resetPassword">RESET PASSWORD</span>
+                        </button>
+                    </form>
+                </div>
+
+                <p class="toggle-form">
+                    <span data-i18n="rememberPassword">Remember your password?</span>
+                    <a href="#" onclick="showLogin(); return false;" class="link">
+                        <span data-i18n="loginHere">Login here</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="section" style="display: none;">
+            <!-- Tabs (NO SETTINGS HERE) -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('categories')">
+                    <span data-i18n="categories">Categories</span>
+                </button>
+                <button class="tab-btn" onclick="showTab('menuItems')">
+                    <span data-i18n="menuItems">Menu Items</span>
+                </button>
+                <button class="tab-btn" onclick="showTab('tables')">
+                    <span data-i18n="tables">Tables</span>
+                </button>
+                <button class="tab-btn" onclick="showTab('orders')">
+                    <span data-i18n="orders">Orders</span>
+                </button>
+            </div>
+
+            <!-- Categories Tab -->
+            <div id="categoriesTab" class="tab-content active">
+                <div class="section-header">
+                    <h2 data-i18n="categories">Categories</h2>
+                    <button onclick="showCreateCategoryModal()" class="btn btn-primary">
+                        <span data-i18n="addCategory">+ Add Category</span>
+                    </button>
+                </div>
+                <div id="categoriesList" class="grid"></div>
+            </div>
+
+            <!-- Menu Items Tab -->
+            <div id="menuItemsTab" class="tab-content">
+                <div class="section-header">
+                    <h2 data-i18n="menuItems">Menu Items</h2>
+                    <button onclick="showCreateMenuItemModal()" class="btn btn-primary">
+                        <span data-i18n="addMenuItem">+ Add Menu Item</span>
+                    </button>
+                </div>
+                <div id="menuItemsList" class="grid"></div>
+            </div>
+
+            <!-- Tables Tab -->
+            <div id="tablesTab" class="tab-content">
+                <div class="section-header">
+                    <h2 data-i18n="tables">Tables</h2>
+                    <button onclick="showCreateTableModal()" class="btn btn-primary">
+                        <span data-i18n="addTable">+ Add Table</span>
+                    </button>
+                </div>
+                <div id="tablesList" class="grid"></div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="ordersTab" class="tab-content">
+                <div class="section-header">
+                    <h2 data-i18n="orders">Orders</h2>
+                    <button onclick="showCreateOrderModal()" class="btn btn-success">
+                        <span data-i18n="newOrder">+ New Order</span>
+                    </button>
+                </div>
+                <div id="ordersList" class="grid"></div>
+            </div>
+
+            <!-- Settings Tab (HIDDEN, accessed via dropdown) -->
+            <div id="settingsTab" class="tab-content">
+                <div class="section-header">
+                    <h2 data-i18n="emailSettings">Email Settings</h2>
+                </div>
+                <div class="card" style="max-width: 700px;">
+                    <form id="emailSettingsForm">
+                        <div class="form-group">
+                            <label>SMTP Server</label>
+                            <input type="text" id="settingSmtpServer" placeholder="smtp.gmail.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>SMTP Port</label>
+                            <input type="number" id="settingSmtpPort" placeholder="587" required>
+                        </div>
+                        <div class="form-group">
+                            <label>From Email</label>
+                            <input type="email" id="settingFromEmail" placeholder="noreply@restaurant.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Password</label>
+                            <input type="password" id="settingPassword" placeholder="App Password">
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="settingEnableSsl" checked>
+                            <label for="settingEnableSsl">Enable SSL</label>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <span data-i18n="saveSettings">Save Settings</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="createCategoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('createCategoryModal')">&times;</span>
+            <h2 data-i18n="createCategory">Create Category</h2>
+            <form id="createCategoryForm">
+                <div class="form-group">
+                    <label data-i18n="categoryName">Category Name</label>
+                    <input type="text" id="catName" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="categoryNameAr">Category Name (Arabic)</label>
+                    <input type="text" id="catNameAr" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="description">Description</label>
+                    <textarea id="catDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="displayOrder">Display Order</label>
+                    <input type="number" id="catDisplayOrder" value="1" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span data-i18n="create">Create</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="createMenuItemModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('createMenuItemModal')">&times;</span>
+            <h2 data-i18n="createMenuItem">Create Menu Item</h2>
+            <form id="createMenuItemForm">
+                <div class="form-group">
+                    <label data-i18n="category">Category</label>
+                    <select id="menuItemCategory" required></select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="itemName">Item Name</label>
+                    <input type="text" id="menuItemName" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="itemNameAr">Item Name (Arabic)</label>
+                    <input type="text" id="menuItemNameAr" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="description">Description</label>
+                    <textarea id="menuItemDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="price">Price (EGP)</label>
+                    <input type="number" step="0.01" id="menuItemPrice" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="imageUrl">Image URL</label>
+                    <input type="text" id="menuItemImageUrl" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="prepTime">Preparation Time (minutes)</label>
+                    <input type="number" id="menuItemPrepTime" value="10" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span data-i18n="create">Create</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="createTableModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('createTableModal')">&times;</span>
+            <h2 data-i18n="createTable">Create Table</h2>
+            <form id="createTableForm">
+                <div class="form-group">
+                    <label data-i18n="tableNumber">Table Number</label>
+                    <input type="number" id="tableNumber" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="capacity">Capacity</label>
+                    <input type="number" id="tableCapacity" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="floorSection">Floor Section</label>
+                    <input type="text" id="tableSection" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span data-i18n="create">Create</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="createOrderModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeModal('createOrderModal')">&times;</span>
+            <h2 data-i18n="createOrder">Create Order</h2>
+            <form id="createOrderForm">
+                <div class="form-group">
+                    <label data-i18n="selectTable">Select Table</label>
+                    <select id="orderTable" required></select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="notes">Notes</label>
+                    <textarea id="orderNotes" rows="2"></textarea>
+                </div>
+                <h3 data-i18n="orderItems">Order Items</h3>
+                <div id="orderItemsList"></div>
+                <button type="button" onclick="addOrderItem()" class="btn btn-secondary">
+                    <span data-i18n="addItem">+ Add Item</span>
+                </button>
+                <br><br>
+                <button type="submit" class="btn btn-success">
+                    <span data-i18n="createOrder">Create Order</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('changePasswordModal')">&times;</span>
+            <h2 data-i18n="changePassword">Change Password</h2>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label data-i18n="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="newPassword">New Password</label>
+                    <input type="password" id="newPasswordChange" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPasswordChange" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span data-i18n="changePassword">Change Password</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
+            <h2 data-i18n="editProfile">Edit Profile</h2>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label data-i18n="fullName">Full Name</label>
+                    <input type="text" id="editFullName" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="email">Email</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="username">Username</label>
+                    <input type="text" id="editUsername" disabled>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span data-i18n="save">Save Changes</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner-circle">
+                <div class="spinner-logo">🍽️</div>
+            </div>
+            <p class="loading-text" data-i18n="loading">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="translations.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="appTitle">Restaurant Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .waves-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 50%, rgba(102, 126, 234, 0.08) 100%);
+            animation: wave 20s linear infinite;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+            .wave:nth-child(1) {
+                top: -10%;
+                animation-delay: 0s;
+                opacity: 0.4;
+            }
+
+            .wave:nth-child(2) {
+                top: 0%;
+                animation-delay: -7s;
+                opacity: 0.3;
+            }
+
+            .wave:nth-child(3) {
+                top: 10%;
+                animation-delay: -14s;
+                opacity: 0.2;
+            }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(0) translateZ(0);
+            }
+
+            100% {
+                transform: translateX(-50%) translateZ(0);
+            }
+        }
+
+        .landing-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 40px;
+            max-width: 900px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float-logo 4s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        @keyframes float-logo {
+            0%, 100% {
+                transform: translateY(0) translateZ(0);
+            }
+
+            50% {
+                transform: translateY(-15px) translateZ(0);
+            }
+        }
+
+        h1 {
+            font-size: 56px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            font-size: 22px;
+            color: #a8b2d1;
+            margin-bottom: 50px;
+            font-weight: 400;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 80px;
+        }
+
+        .btn-3d {
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        .btn-primary-3d {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+            .btn-primary-3d:hover {
+                transform: translateY(-5px) translateZ(0);
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            }
+
+            .btn-primary-3d:active {
+                transform: translateY(-2px) scale(0.98) translateZ(0);
+            }
+
+        .btn-secondary-3d {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+        }
+
+            .btn-secondary-3d:hover {
+                transform: translateY(-5px) translateZ(0);
+                box-shadow: 0 15px 40px rgba(240, 147, 251, 0.4);
+            }
+
+            .btn-secondary-3d:active {
+                transform: translateY(-2px) scale(0.98) translateZ(0);
+            }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 30px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+            .feature-card:hover {
+                transform: translateY(-10px) translateZ(0);
+                background: rgba(102, 126, 234, 0.08);
+                border-color: rgba(102, 126, 234, 0.25);
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25);
+            }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 19px;
+            color: #a78bfa;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .feature-desc {
+            color: #a8b2d1;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            background: rgba(15, 20, 40, 0.8);
+            padding: 8px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        [dir="rtl"] .language-switcher {
+            right: auto;
+            left: 20px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            background: transparent;
+            color: #a8b2d1;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+            .lang-btn:hover,
+            .lang-btn.active {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+            }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 38px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 18px;
+            }
+
+            .logo {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switcher">
+        <button onclick="switchLanguage('en')" class="lang-btn active" id="langEN">EN</button>
+        <button onclick="switchLanguage('ar')" class="lang-btn" id="langAR">عربي</button>
+    </div>
+
+    <div class="waves-container">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <div class="landing-container">
+        <div class="logo">🍽️</div>
+        <h1 data-i18n="appTitle">Restaurant Management System</h1>
+        <p class="subtitle" data-i18n="subtitle">Manage your restaurant with ease and efficiency</p>
+
+        <div class="button-group">
+            <a href="dashboard.html" class="btn-3d btn-primary-3d">
+                <span data-i18n="launchDashboard">🚀 Launch Dashboard</span>
+            </a>
+            <a href="https://localhost:7054/swagger" target="_blank" class="btn-3d btn-secondary-3d">
+                <span data-i18n="apiDocs">📚 View API Docs</span>
+            </a>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <div class="feature-title" data-i18n="featureUser">User Management</div>
+                <div class="feature-desc" data-i18n="featureUserDesc">Manage staff with role-based access control</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title" data-i18n="featureMenu">Menu Control</div>
+                <div class="feature-desc" data-i18n="featureMenuDesc">Create and manage your restaurant menu</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🪑</div>
+                <div class="feature-title" data-i18n="featureTable">Table Tracking</div>
+                <div class="feature-desc" data-i18n="featureTableDesc">Monitor table availability in real-time</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <div class="feature-title" data-i18n="featureOrder">Order Management</div>
+                <div class="feature-desc" data-i18n="featureOrderDesc">Track orders from kitchen to customer</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+</body>
+</html>

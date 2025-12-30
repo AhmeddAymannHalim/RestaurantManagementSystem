@@ -1,0 +1,63 @@
+﻿{
+  "app": {
+    "title": "نظام إدارة المطاعم",
+    "subtitle": "إدارة مطعمك بسهولة"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "email": "البريد الإلكتروني",
+    "fullName": "الاسم الكامل",
+    "role": "الدور الوظيفي",
+    "loginBtn": "تسجيل الدخول",
+    "registerBtn": "إنشاء حساب",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "sendOTP": "إرسال الرمز",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "otpCode": "رمز التحقق",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "apiDocs": "وثائق API",
+    "settings": "الإعدادات",
+    "changePassword": "تغيير كلمة المرور",
+    "editProfile": "تعديل الملف الشخصي",
+    "logout": "تسجيل الخروج"
+  },
+  "tabs": {
+    "categories": "الفئات",
+    "menuItems": "عناصر القائمة",
+    "tables": "الطاولات",
+    "orders": "الطلبات"
+  },
+  "actions": {
+    "add": "إضافة",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "close": "إغلاق"
+  },
+  "labels": {
+    "categoryName": "اسم الفئة",
+    "categoryNameAr": "اسم الفئة (بالعربية)",
+    "description": "الوصف",
+    "items": "عناصر",
+    "price": "السعر",
+    "category": "الفئة",
+    "arabic": "عربي"
+  },
+  "messages": {
+    "loginSuccess": "تم تسجيل الدخول بنجاح!",
+    "loginFailed": "فشل تسجيل الدخول",
+    "createSuccess": "تم الإنشاء بنجاح!",
+    "updateSuccess": "تم التحديث بنجاح!",
+    "deleteSuccess": "تم الحذف بنجاح!",
+    "error": "حدث خطأ",
+    "loading": "جاري التحميل..."
+  }
+}

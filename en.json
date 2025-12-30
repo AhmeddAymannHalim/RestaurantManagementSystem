@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Restaurant Management System",
+    "subtitle": "Manage your restaurant with ease"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "username": "Username",
+    "password": "Password",
+    "email": "Email",
+    "fullName": "Full Name",
+    "role": "Role",
+    "loginBtn": "LOGIN",
+    "registerBtn": "REGISTER",
+    "forgotPassword": "Forgot Password?",
+    "sendOTP": "Send OTP",
+    "resetPassword": "Reset Password",
+    "otpCode": "OTP Code",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password"
+  },
+  "nav": {
+    "home": "Home",
+    "apiDocs": "API Docs",
+    "settings": "Settings",
+    "changePassword": "Change Password",
+    "editProfile": "Edit Profile",
+    "logout": "Logout"
+  },
+  "tabs": {
+    "categories": "CATEGORIES",
+    "menuItems": "MENU ITEMS",
+    "tables": "TABLES",
+    "orders": "ORDERS"
+  },
+  "actions": {
+    "add": "ADD",
+    "edit": "EDIT",
+    "delete": "DELETE",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "labels": {
+    "categoryName": "Category Name",
+    "categoryNameAr": "Category Name (Arabic)",
+    "description": "Description",
+    "items": "Items",
+    "price": "Price",
+    "category": "Category",
+    "arabic": "Arabic"
+  },
+  "messages": {
+    "loginSuccess": "Login successful!",
+    "loginFailed": "Login failed",
+    "createSuccess": "Created successfully!",
+    "updateSuccess": "Updated successfully!",
+    "deleteSuccess": "Deleted successfully!",
+    "error": "An error occurred",
+    "loading": "Loading..."
+  }
+}
