@@ -7,10 +7,8 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- PERFECT HEADER: User Left | Logo Center | Lang Right -->
     <header>
         <div class="header-flex">
-            <!-- LEFT: User Button + Dropdown -->
             <div class="header-left">
                 <div id="userInfo" class="user-info" style="display: none;">
                     <span id="userName" class="user-name-text"></span>
@@ -36,9 +34,6 @@
                             <button onclick="goToSwagger()" class="dropdown-item">
                                 <span data-i18n="apiDocs">📚 API Docs</span>
                             </button>
-                            <button onclick="showSettingsTab()" class="dropdown-item" id="settingsMenuBtn" style="display: none;">
-                                <span data-i18n="settings">⚙️ Settings</span>
-                            </button>
                             <div class="dropdown-divider"></div>
                             <button onclick="showChangePasswordModal()" class="dropdown-item">
                                 <span data-i18n="changePassword">🔑 Change Password</span>
@@ -54,13 +49,9 @@
                     </div>
                 </div>
             </div>
-
-            <!-- CENTER: Logo -->
             <div class="header-center">
                 <h1 data-i18n="appTitle">🍽️ Restaurant Management System</h1>
             </div>
-
-            <!-- RIGHT: Language Switcher -->
             <div class="header-right">
                 <div class="language-switcher">
                     <button onclick="switchLanguage('en')" class="lang-btn active" id="langEN">EN</button>
@@ -70,10 +61,8 @@
         </div>
     </header>
 
-    <!-- Main Container -->
     <div class="container">
-        <!-- Login Section -->
-        <div id="loginSection" class="section">
+        <div id="loginSection" class="section" style="display: block;">
             <div class="card">
                 <h2 data-i18n="loginTitle">Login</h2>
                 <form id="loginForm">
@@ -103,26 +92,25 @@
             </div>
         </div>
 
-        <!-- Register Section -->
         <div id="registerSection" class="section" style="display: none;">
             <div class="card">
                 <h2 data-i18n="registerTitle">Register</h2>
                 <form id="registerForm">
                     <div class="form-group">
                         <label data-i18n="username">Username</label>
-                        <input type="text" id="regUsername" required data-i18n-placeholder="enterUsername">
+                        <input type="text" id="regUsername" required>
                     </div>
                     <div class="form-group">
                         <label data-i18n="email">Email</label>
-                        <input type="email" id="regEmail" required data-i18n-placeholder="enterEmail">
+                        <input type="email" id="regEmail" required>
                     </div>
                     <div class="form-group">
                         <label data-i18n="password">Password</label>
-                        <input type="password" id="regPassword" required data-i18n-placeholder="enterPassword">
+                        <input type="password" id="regPassword" required>
                     </div>
                     <div class="form-group">
                         <label data-i18n="fullName">Full Name</label>
-                        <input type="text" id="regFullName" required data-i18n-placeholder="enterFullName">
+                        <input type="text" id="regFullName" required>
                     </div>
                     <div class="form-group">
                         <label data-i18n="role">Role</label>
@@ -146,51 +134,39 @@
             </div>
         </div>
 
-        <!-- Forgot Password Section -->
         <div id="forgotPasswordSection" class="section" style="display: none;">
             <div class="card">
                 <h2 data-i18n="forgotPasswordTitle">Forgot Password</h2>
-
                 <div id="forgotStep1">
                     <form id="forgotPasswordForm">
                         <div class="form-group">
-                            <label data-i18n="email">Email Address</label>
-                            <input type="email" id="forgotEmail" required data-i18n-placeholder="enterEmail">
+                            <label data-i18n="email">Email</label>
+                            <input type="email" id="forgotEmail" required>
                         </div>
                         <button type="submit" class="btn btn-primary">
                             <span data-i18n="sendOTP">SEND OTP</span>
                         </button>
                     </form>
                 </div>
-
                 <div id="forgotStep2" style="display: none;">
                     <form id="resetPasswordForm">
                         <div class="form-group">
                             <label data-i18n="otpCode">OTP Code</label>
-                            <input type="text" id="otpCode" maxlength="6" required>
+                            <input type="text" id="otpCode" required maxlength="6">
                         </div>
-
-                        <div style="text-align: center; margin: 20px 0;">
-                            <button type="button" id="resendOtpBtn" onclick="resendOTP()"
-                                    style="background: transparent; color: #a78bfa; border: none; cursor: pointer; text-decoration: none; font-size: 15px; font-weight: 500; transition: all 0.3s; padding: 8px 16px;">
-                                Resend OTP (60s)
-                            </button>
-                        </div>
-
                         <div class="form-group">
                             <label data-i18n="newPassword">New Password</label>
                             <input type="password" id="newPassword" required>
                         </div>
                         <div class="form-group">
                             <label data-i18n="confirmPassword">Confirm Password</label>
-                            <input type="password" id="confirmPassword" required>
+                            <input type="password" id="confirmPasswordReset" required>
                         </div>
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-primary">
                             <span data-i18n="resetPassword">RESET PASSWORD</span>
                         </button>
                     </form>
                 </div>
-
                 <p class="toggle-form">
                     <span data-i18n="rememberPassword">Remember your password?</span>
                     <a href="#" onclick="showLogin(); return false;" class="link">
@@ -200,105 +176,88 @@
             </div>
         </div>
 
-        <!-- Dashboard Section -->
         <div id="dashboardSection" class="section" style="display: none;">
-            <!-- Tabs (NO SETTINGS HERE) -->
-            <div class="tabs">
-                <button class="tab-btn active" onclick="showTab('categories')">
-                    <span data-i18n="categories">Categories</span>
-                </button>
-                <button class="tab-btn" onclick="showTab('menuItems')">
-                    <span data-i18n="menuItems">Menu Items</span>
-                </button>
-                <button class="tab-btn" onclick="showTab('tables')">
-                    <span data-i18n="tables">Tables</span>
-                </button>
-                <button class="tab-btn" onclick="showTab('orders')">
-                    <span data-i18n="orders">Orders</span>
-                </button>
-            </div>
+            <!-- ✅ SIDEBAR IS BACK! -->
+            <div class="dashboard-wrapper">
+                <nav class="sidebar-nav">
+                    <div class="nav-brand">
+                        <span class="nav-icon">🍽️</span>
+                        <span class="nav-title">Management</span>
+                    </div>
+                    <ul class="nav-menu">
+                        <li>
+                            <button class="nav-btn active" onclick="showTab('categories')" data-tab="categories">
+                                <span class="nav-btn-icon">📂</span>
+                                <span class="nav-btn-text" data-i18n="categories">Categories</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-btn" onclick="showTab('menuItems')" data-tab="menuItems">
+                                <span class="nav-btn-icon">🍜</span>
+                                <span class="nav-btn-text" data-i18n="menuItems">Menu Items</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-btn" onclick="showTab('tables')" data-tab="tables">
+                                <span class="nav-btn-icon">🪑</span>
+                                <span class="nav-btn-text" data-i18n="tables">Tables</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-btn" onclick="showTab('orders')" data-tab="orders">
+                                <span class="nav-btn-icon">📋</span>
+                                <span class="nav-btn-text" data-i18n="orders">Orders</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
 
-            <!-- Categories Tab -->
-            <div id="categoriesTab" class="tab-content active">
-                <div class="section-header">
-                    <h2 data-i18n="categories">Categories</h2>
-                    <button onclick="showCreateCategoryModal()" class="btn btn-primary">
-                        <span data-i18n="addCategory">+ Add Category</span>
-                    </button>
-                </div>
-                <div id="categoriesList" class="grid"></div>
-            </div>
+                <main class="main-content">
+                    <div id="categoriesTab" class="tab-content active">
+                        <div class="tab-header">
+                            <h2 data-i18n="categories">Categories</h2>
+                            <button class="btn btn-primary" onclick="openModal('createCategoryModal')">
+                                <span data-i18n="addCategory">➕ ADD CATEGORY</span>
+                            </button>
+                        </div>
+                        <div id="categoriesList"></div>
+                    </div>
 
-            <!-- Menu Items Tab -->
-            <div id="menuItemsTab" class="tab-content">
-                <div class="section-header">
-                    <h2 data-i18n="menuItems">Menu Items</h2>
-                    <button onclick="showCreateMenuItemModal()" class="btn btn-primary">
-                        <span data-i18n="addMenuItem">+ Add Menu Item</span>
-                    </button>
-                </div>
-                <div id="menuItemsList" class="grid"></div>
-            </div>
+                    <div id="menuItemsTab" class="tab-content">
+                        <div class="tab-header">
+                            <h2 data-i18n="menuItems">Menu Items</h2>
+                            <button class="btn btn-primary" onclick="showCreateMenuItemModal()">
+                                <span data-i18n="addMenuItem">➕ ADD MENU ITEM</span>
+                            </button>
+                        </div>
+                        <div id="menuItemsList"></div>
+                    </div>
 
-            <!-- Tables Tab -->
-            <div id="tablesTab" class="tab-content">
-                <div class="section-header">
-                    <h2 data-i18n="tables">Tables</h2>
-                    <button onclick="showCreateTableModal()" class="btn btn-primary">
-                        <span data-i18n="addTable">+ Add Table</span>
-                    </button>
-                </div>
-                <div id="tablesList" class="grid"></div>
-            </div>
+                    <div id="tablesTab" class="tab-content">
+                        <div class="tab-header">
+                            <h2 data-i18n="tables">Tables</h2>
+                            <button class="btn btn-primary" onclick="openModal('createTableModal')">
+                                <span data-i18n="addTable">➕ ADD TABLE</span>
+                            </button>
+                        </div>
+                        <div id="tablesList"></div>
+                    </div>
 
-            <!-- Orders Tab -->
-            <div id="ordersTab" class="tab-content">
-                <div class="section-header">
-                    <h2 data-i18n="orders">Orders</h2>
-                    <button onclick="showCreateOrderModal()" class="btn btn-success">
-                        <span data-i18n="newOrder">+ New Order</span>
-                    </button>
-                </div>
-                <div id="ordersList" class="grid"></div>
-            </div>
-
-            <!-- Settings Tab (HIDDEN, accessed via dropdown) -->
-            <div id="settingsTab" class="tab-content">
-                <div class="section-header">
-                    <h2 data-i18n="emailSettings">Email Settings</h2>
-                </div>
-                <div class="card" style="max-width: 700px;">
-                    <form id="emailSettingsForm">
-                        <div class="form-group">
-                            <label>SMTP Server</label>
-                            <input type="text" id="settingSmtpServer" placeholder="smtp.gmail.com" required>
+                    <div id="ordersTab" class="tab-content">
+                        <div class="tab-header">
+                            <h2 data-i18n="orders">Orders</h2>
+                            <button class="btn btn-success" onclick="showCreateOrderModal()">
+                                <span data-i18n="newOrder">🎯 NEW ORDER</span>
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>SMTP Port</label>
-                            <input type="number" id="settingSmtpPort" placeholder="587" required>
-                        </div>
-                        <div class="form-group">
-                            <label>From Email</label>
-                            <input type="email" id="settingFromEmail" placeholder="noreply@restaurant.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email Password</label>
-                            <input type="password" id="settingPassword" placeholder="App Password">
-                        </div>
-                        <div class="checkbox-wrapper">
-                            <input type="checkbox" id="settingEnableSsl" checked>
-                            <label for="settingEnableSsl">Enable SSL</label>
-                        </div>
-                        <button type="submit" class="btn btn-success">
-                            <span data-i18n="saveSettings">Save Settings</span>
-                        </button>
-                    </form>
-                </div>
+                        <div id="ordersList"></div>
+                    </div>
+                </main>
             </div>
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- MODALS -->
     <div id="createCategoryModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('createCategoryModal')">&times;</span>
@@ -306,19 +265,19 @@
             <form id="createCategoryForm">
                 <div class="form-group">
                     <label data-i18n="categoryName">Category Name</label>
-                    <input type="text" id="catName" required>
+                    <input type="text" id="catName" data-validate="required|minLength:2|maxLength:100" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="categoryNameAr">Category Name (Arabic)</label>
-                    <input type="text" id="catNameAr" required>
+                    <input type="text" id="catNameAr" data-validate="minLength:2|maxLength:100">
                 </div>
                 <div class="form-group">
                     <label data-i18n="description">Description</label>
-                    <textarea id="catDescription" rows="3"></textarea>
+                    <textarea id="catDescription" data-validate="maxLength:500" rows="3"></textarea>
                 </div>
                 <div class="form-group">
                     <label data-i18n="displayOrder">Display Order</label>
-                    <input type="number" id="catDisplayOrder" value="1" required>
+                    <input type="number" id="catDisplayOrder" data-validate="required|minValue:1" value="1" required>
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <span data-i18n="create">Create</span>
@@ -338,27 +297,27 @@
                 </div>
                 <div class="form-group">
                     <label data-i18n="itemName">Item Name</label>
-                    <input type="text" id="menuItemName" required>
+                    <input type="text" id="menuItemName" data-validate="required|minLength:2|maxLength:100" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="itemNameAr">Item Name (Arabic)</label>
-                    <input type="text" id="menuItemNameAr" required>
+                    <input type="text" id="menuItemNameAr" data-validate="required|minLength:2|maxLength:100" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="description">Description</label>
-                    <textarea id="menuItemDescription" rows="3"></textarea>
+                    <textarea id="menuItemDescription" data-validate="maxLength:500" rows="3"></textarea>
                 </div>
                 <div class="form-group">
                     <label data-i18n="price">Price (EGP)</label>
-                    <input type="number" step="0.01" id="menuItemPrice" required>
+                    <input type="number" step="0.01" id="menuItemPrice" data-validate="required|number|minValue:0" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="imageUrl">Image URL</label>
-                    <input type="text" id="menuItemImageUrl" placeholder="https://example.com/image.jpg">
+                    <input type="text" id="menuItemImageUrl" data-validate="url">
                 </div>
                 <div class="form-group">
-                    <label data-i18n="prepTime">Preparation Time (minutes)</label>
-                    <input type="number" id="menuItemPrepTime" value="10" required>
+                    <label data-i18n="prepTime">Prep Time (mins)</label>
+                    <input type="number" id="menuItemPrepTime" data-validate="required|number|minValue:1" value="10" required>
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <span data-i18n="create">Create</span>
@@ -374,15 +333,15 @@
             <form id="createTableForm">
                 <div class="form-group">
                     <label data-i18n="tableNumber">Table Number</label>
-                    <input type="number" id="tableNumber" required>
+                    <input type="number" id="tableNumber" data-validate="required|number|minValue:1" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="capacity">Capacity</label>
-                    <input type="number" id="tableCapacity" required>
+                    <input type="number" id="tableCapacity" data-validate="required|number|minValue:1" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="floorSection">Floor Section</label>
-                    <input type="text" id="tableSection" required>
+                    <input type="text" id="tableSection" data-validate="required|minLength:2|maxLength:50" required>
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <span data-i18n="create">Create</span>
@@ -424,18 +383,18 @@
             <form id="changePasswordForm">
                 <div class="form-group">
                     <label data-i18n="currentPassword">Current Password</label>
-                    <input type="password" id="currentPassword" required>
+                    <input type="password" id="currentPassword" data-validate="required|minLength:6" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="newPassword">New Password</label>
-                    <input type="password" id="newPasswordChange" required>
+                    <input type="password" id="newPasswordChange" data-validate="required|passwordStrength" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPasswordChange" required>
+                    <input type="password" id="confirmPasswordChange" data-validate="required|minLength:8" required>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    <span data-i18n="changePassword">Change Password</span>
+                    <span data-i18n="save">Save</span>
                 </button>
             </form>
         </div>
@@ -448,24 +407,23 @@
             <form id="editProfileForm">
                 <div class="form-group">
                     <label data-i18n="fullName">Full Name</label>
-                    <input type="text" id="editFullName" required>
+                    <input type="text" id="editFullName" data-validate="required|minLength:3|maxLength:100" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="email">Email</label>
-                    <input type="email" id="editEmail" required>
+                    <input type="email" id="editEmail" data-validate="required|email" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="username">Username</label>
                     <input type="text" id="editUsername" disabled>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    <span data-i18n="save">Save Changes</span>
+                    <span data-i18n="save">Save</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner">
             <div class="spinner-circle">
@@ -475,10 +433,173 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="toast"></div>
 
     <script src="translations.js"></script>
     <script src="app.js"></script>
+
+    <script>
+        // 🔥 REAL-TIME VALIDATION - BUILT IN! 🔥
+        const RealTimeValidator = {
+            shakeElement(element) {
+                element.style.animation = 'none';
+                setTimeout(() => {
+                    element.style.animation = 'shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)';
+                }, 10);
+            },
+
+            showError(input, message) {
+                const formGroup = input.closest('.form-group');
+                if (!formGroup) return;
+                formGroup.classList.add('error');
+                formGroup.classList.remove('success');
+                this.shakeElement(input);
+
+                let errorMsg = formGroup.querySelector('.error-message');
+                if (!errorMsg) {
+                    errorMsg = document.createElement('div');
+                    errorMsg.className = 'error-message';
+                    formGroup.appendChild(errorMsg);
+                }
+                errorMsg.textContent = message;
+                errorMsg.style.opacity = '0';
+                setTimeout(() => errorMsg.style.opacity = '1', 10);
+            },
+
+            showSuccess(input) {
+                const formGroup = input.closest('.form-group');
+                if (!formGroup) return;
+                formGroup.classList.add('success');
+                formGroup.classList.remove('error');
+
+                const errorMsg = formGroup.querySelector('.error-message');
+                if (errorMsg) {
+                    errorMsg.style.opacity = '0';
+                    setTimeout(() => errorMsg.remove(), 300);
+                }
+            },
+
+            clearValidation(input) {
+                const formGroup = input.closest('.form-group');
+                if (!formGroup) return;
+                formGroup.classList.remove('error', 'success');
+                const errorMsg = formGroup.querySelector('.error-message');
+                if (errorMsg) {
+                    errorMsg.style.opacity = '0';
+                    setTimeout(() => errorMsg.remove(), 300);
+                }
+            },
+
+            validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            },
+
+            validatePassword(password) {
+                if (password.length < 8) return { valid: false, message: 'Password must be at least 8 characters' };
+                if (!/[A-Z]/.test(password)) return { valid: false, message: 'Must contain uppercase letter' };
+                if (!/[a-z]/.test(password)) return { valid: false, message: 'Must contain lowercase letter' };
+                if (!/[0-9]/.test(password)) return { valid: false, message: 'Must contain number' };
+                if (!/[!@#$%^&*]/.test(password)) return { valid: false, message: 'Must contain special character' };
+                return { valid: true };
+            },
+
+            init() {
+                // Login
+                const loginUsername = document.getElementById('loginUsername');
+                const loginPassword = document.getElementById('loginPassword');
+
+                loginUsername?.addEventListener('input', (e) => {
+                    const value = e.target.value.trim();
+                    if (value.length === 0) this.clearValidation(loginUsername);
+                    else if (value.length < 3) this.showError(loginUsername, 'Username must be 3+ characters');
+                    else this.showSuccess(loginUsername);
+                });
+
+                loginPassword?.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    if (value.length === 0) this.clearValidation(loginPassword);
+                    else if (value.length < 6) this.showError(loginPassword, 'Password must be 6+ characters');
+                    else this.showSuccess(loginPassword);
+                });
+
+                // Register
+                const regUsername = document.getElementById('regUsername');
+                const regEmail = document.getElementById('regEmail');
+                const regPassword = document.getElementById('regPassword');
+                const regFullName = document.getElementById('regFullName');
+
+                regUsername?.addEventListener('input', (e) => {
+                    const value = e.target.value.trim();
+                    if (value.length === 0) this.clearValidation(regUsername);
+                    else if (value.length < 3) this.showError(regUsername, 'Username must be 3+ characters');
+                    else if (!/^[a-zA-Z0-9_]+$/.test(value)) this.showError(regUsername, 'Only letters, numbers, underscore');
+                    else this.showSuccess(regUsername);
+                });
+
+                regEmail?.addEventListener('input', (e) => {
+                    const value = e.target.value.trim();
+                    if (value.length === 0) this.clearValidation(regEmail);
+                    else if (!this.validateEmail(value)) this.showError(regEmail, 'Invalid email address');
+                    else this.showSuccess(regEmail);
+                });
+
+                regPassword?.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    if (value.length === 0) this.clearValidation(regPassword);
+                    else {
+                        const result = this.validatePassword(value);
+                        if (result.valid) this.showSuccess(regPassword);
+                        else this.showError(regPassword, result.message);
+                    }
+                });
+
+                regFullName?.addEventListener('input', (e) => {
+                    const value = e.target.value.trim();
+                    if (value.length === 0) this.clearValidation(regFullName);
+                    else if (value.length < 3) this.showError(regFullName, 'Name must be 3+ characters');
+                    else if (!/^[a-zA-Z\s]+$/.test(value)) this.showError(regFullName, 'Only letters and spaces');
+                    else this.showSuccess(regFullName);
+                });
+
+                // Reset Password
+                const newPassword = document.getElementById('newPassword');
+                const confirmPasswordReset = document.getElementById('confirmPasswordReset');
+
+                newPassword?.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    if (value.length === 0) this.clearValidation(newPassword);
+                    else {
+                        const result = this.validatePassword(value);
+                        if (result.valid) this.showSuccess(newPassword);
+                        else this.showError(newPassword, result.message);
+                    }
+
+                    if (confirmPasswordReset?.value) {
+                        if (confirmPasswordReset.value !== value) {
+                            this.showError(confirmPasswordReset, 'Passwords do not match');
+                        } else {
+                            this.showSuccess(confirmPasswordReset);
+                        }
+                    }
+                });
+
+                confirmPasswordReset?.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    if (value.length === 0) this.clearValidation(confirmPasswordReset);
+                    else if (value !== newPassword?.value) this.showError(confirmPasswordReset, 'Passwords do not match');
+                    else this.showSuccess(confirmPasswordReset);
+                });
+
+                console.log('✅ Real-time validation initialized');
+            }
+        };
+
+        // Initialize validation when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => RealTimeValidator.init());
+        } else {
+            RealTimeValidator.init();
+        }
+    </script>
 </body>
 </html>

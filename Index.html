@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="appTitle">Restaurant Management System</title>
+    <title>Restaurant Management System | نظام إدارة المطاعم</title>
     <style>
         * {
             margin: 0;
@@ -12,13 +12,14 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Cairo', 'Tajawal';
             background: #0a0e27;
             overflow-x: hidden;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: direction 0.3s ease;
         }
 
         .waves-container {
@@ -256,6 +257,23 @@
                 color: white;
             }
 
+        /* Hide by default, show based on language */
+        .lang-en {
+            display: block;
+        }
+
+        .lang-ar {
+            display: none;
+        }
+
+        [dir="rtl"] .lang-en {
+            display: none;
+        }
+
+        [dir="rtl"] .lang-ar {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 38px;
@@ -290,42 +308,110 @@
 
     <div class="landing-container">
         <div class="logo">🍽️</div>
-        <h1 data-i18n="appTitle">Restaurant Management System</h1>
-        <p class="subtitle" data-i18n="subtitle">Manage your restaurant with ease and efficiency</p>
 
-        <div class="button-group">
-            <a href="dashboard.html" class="btn-3d btn-primary-3d">
-                <span data-i18n="launchDashboard">🚀 Launch Dashboard</span>
-            </a>
-            <a href="https://localhost:7054/swagger" target="_blank" class="btn-3d btn-secondary-3d">
-                <span data-i18n="apiDocs">📚 View API Docs</span>
-            </a>
+        <!-- English Content -->
+        <div class="lang-en">
+            <h1>Restaurant Management System</h1>
+            <p class="subtitle">Manage your restaurant with ease and efficiency</p>
+
+            <div class="button-group">
+                <a href="dashboard.html" class="btn-3d btn-primary-3d">
+                    🚀 Launch Dashboard
+                </a>
+                <a href="https://localhost:7054/swagger" target="_blank" class="btn-3d btn-secondary-3d">
+                    📚 View API Docs
+                </a>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-title">User Management</div>
+                    <div class="feature-desc">Manage staff with role-based access control</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-title">Menu Control</div>
+                    <div class="feature-desc">Create and manage your restaurant menu</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🪑</div>
+                    <div class="feature-title">Table Tracking</div>
+                    <div class="feature-desc">Monitor table availability in real-time</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <div class="feature-title">Order Management</div>
+                    <div class="feature-desc">Track orders from kitchen to customer</div>
+                </div>
+            </div>
         </div>
 
-        <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon">👥</div>
-                <div class="feature-title" data-i18n="featureUser">User Management</div>
-                <div class="feature-desc" data-i18n="featureUserDesc">Manage staff with role-based access control</div>
+        <!-- Arabic Content -->
+        <div class="lang-ar">
+            <h1>نظام إدارة المطاعم</h1>
+            <p class="subtitle">إدارة مطعمك بسهولة وكفاءة</p>
+
+            <div class="button-group">
+                <a href="dashboard.html" class="btn-3d btn-primary-3d">
+                    🚀 فتح لوحة التحكم
+                </a>
+                <a href="https://localhost:7054/swagger" target="_blank" class="btn-3d btn-secondary-3d">
+                    📚 عرض وثائق API
+                </a>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📋</div>
-                <div class="feature-title" data-i18n="featureMenu">Menu Control</div>
-                <div class="feature-desc" data-i18n="featureMenuDesc">Create and manage your restaurant menu</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🪑</div>
-                <div class="feature-title" data-i18n="featureTable">Table Tracking</div>
-                <div class="feature-desc" data-i18n="featureTableDesc">Monitor table availability in real-time</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📦</div>
-                <div class="feature-title" data-i18n="featureOrder">Order Management</div>
-                <div class="feature-desc" data-i18n="featureOrderDesc">Track orders from kitchen to customer</div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-title">إدارة المستخدمين</div>
+                    <div class="feature-desc">إدارة الموظفين مع التحكم في الصلاحيات</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-title">التحكم في القائمة</div>
+                    <div class="feature-desc">إنشاء وإدارة قائمة مطعمك</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🪑</div>
+                    <div class="feature-title">تتبع الطاولات</div>
+                    <div class="feature-desc">مراقبة توافر الطاولات في الوقت الفعلي</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <div class="feature-title">إدارة الطلبات</div>
+                    <div class="feature-desc">تتبع الطلبات من المطبخ إلى العميل</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="translations.js"></script>
+    <script>
+        function switchLanguage(lang) {
+            const html = document.documentElement;
+            const langEN = document.getElementById('langEN');
+            const langAR = document.getElementById('langAR');
+
+            if (lang === 'ar') {
+                html.setAttribute('dir', 'rtl');
+                html.setAttribute('lang', 'ar');
+                langEN.classList.remove('active');
+                langAR.classList.add('active');
+                localStorage.setItem('language', 'ar');
+            } else {
+                html.setAttribute('dir', 'ltr');
+                html.setAttribute('lang', 'en');
+                langEN.classList.add('active');
+                langAR.classList.remove('active');
+                localStorage.setItem('language', 'en');
+            }
+        }
+
+        // Load saved language on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('language') || 'en';
+            switchLanguage(savedLang);
+        });
+    </script>
 </body>
 </html>

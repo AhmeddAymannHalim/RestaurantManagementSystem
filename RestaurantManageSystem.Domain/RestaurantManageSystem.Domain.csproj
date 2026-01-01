@@ -6,8 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Dependencies\" />
-  </ItemGroup>
-
+	<ItemGroup>
+	</ItemGroup>
 </Project>

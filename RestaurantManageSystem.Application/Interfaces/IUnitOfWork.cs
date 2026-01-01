@@ -10,7 +10,9 @@ namespace RestaurantManageSystem.Application.Interfaces
         IRepository<Table> Tables { get; }
         IRepository<Order> Orders { get; }
         IRepository<OrderItem> OrderItems { get; }
-        IRepository<Setting> Settings { get; }  
+        IRepository<Setting> Settings { get; }
+        IRepository<PasswordResetToken> PasswordResetTokens { get; }
+        IRepository<AuditLog> AuditLogs { get; }
 
         Task<int> SaveChangesAsync();
         Task BeginTransactionAsync();

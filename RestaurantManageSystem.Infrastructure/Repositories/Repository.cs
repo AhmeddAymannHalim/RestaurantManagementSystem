@@ -19,63 +19,17 @@ namespace RestaurantManageSystem.Infrastructure.Repositories
 
         public async Task<T?> GetByIdAsync(int id)
         {
-            // Load all navigation properties
-            var query = _dbSet.AsQueryable();
-
-            // Get all navigation properties
-            var navigations = _context.Model.FindEntityType(typeof(T))?
-                .GetNavigations()
-                .Select(n => n.Name);
-
-            if (navigations != null)
-            {
-                foreach (var property in navigations)
-                {
-                    query = query.Include(property);
-                }
-            }
-
-            return await query.FirstOrDefaultAsync(e => e.Id == id);
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            // Load all navigation properties
-            var query = _dbSet.AsQueryable();
-
-            var navigations = _context.Model.FindEntityType(typeof(T))?
-                .GetNavigations()
-                .Select(n => n.Name);
-
-            if (navigations != null)
-            {
-                foreach (var property in navigations)
-                {
-                    query = query.Include(property);
-                }
-            }
-
-            return await query.ToListAsync();
+            return await _dbSet.ToListAsync();
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
-            // Load all navigation properties
-            var query = _dbSet.AsQueryable();
-
-            var navigations = _context.Model.FindEntityType(typeof(T))?
-                .GetNavigations()
-                .Select(n => n.Name);
-
-            if (navigations != null)
-            {
-                foreach (var property in navigations)
-                {
-                    query = query.Include(property);
-                }
-            }
-
-            return await query.Where(predicate).ToListAsync();
+            return await _dbSet.Where(predicate).ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)

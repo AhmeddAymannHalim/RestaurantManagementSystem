@@ -23,6 +23,7 @@ namespace RestaurantManageSystem.Infrastructure.Data
         public DbSet<Setting> Settings { get; set; }
         public DbSet<EmailSettings> EmailSettings { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -7,17 +7,28 @@ using RestaurantManageSystem.Domain.Enums;
 
 namespace RestaurantManageSystem.Application.Services
 {
-    public class OrderService(IUnitOfWork unitOfWork, IMapper mapper) : IOrderService
+    public class OrderService : IOrderService
     {
+        private readonly IRepository<Order> _orderRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+
+        public OrderService(IRepository<Order> orderRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        {
+            _orderRepository = orderRepository;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
         public async Task<ResponseDto<OrderDto>> GetOrderByIdAsync(int id)
         {
             try
             {
-                var order = await unitOfWork.Orders.GetByIdAsync(id);
+                var order = await _orderRepository.GetByIdAsync(id);
                 if (order == null)
                     return ResponseDto<OrderDto>.FailureResponse("Order not found");
 
-                var orderDto = mapper.Map<OrderDto>(order);
+                var orderDto = _mapper.Map<OrderDto>(order);
                 return ResponseDto<OrderDto>.SuccessResponse(orderDto);
             }
             catch (Exception ex)
@@ -30,26 +41,21 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var orders = await unitOfWork.Orders.GetAllAsync();
+                var allOrders = (await _orderRepository.GetAllAsync()).AsQueryable();
 
                 if (status.HasValue)
-                {
-                    orders = orders.Where(o => o.Status == status.Value);
-                }
+                    allOrders = allOrders.Where(o => o.Status == status.Value);
 
                 if (date.HasValue)
-                {
-                    orders = orders.Where(o => o.OrderDate.Date == date.Value.Date);
-                }
+                    allOrders = allOrders.Where(o => o.OrderDate.Date == date.Value.Date);
 
-                var totalRecords = orders.Count();
-                var items = orders
-                    .OrderByDescending(o => o.OrderDate)
+                var totalRecords = allOrders.Count();
+                var items = allOrders
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
 
-                var orderDtos = mapper.Map<List<OrderDto>>(items);
+                var orderDtos = _mapper.Map<List<OrderDto>>(items);
                 var result = PaginatedResultDto<OrderDto>.Create(orderDtos, page, pageSize, totalRecords);
 
                 return ResponseDto<PaginatedResultDto<OrderDto>>.SuccessResponse(result);
@@ -64,12 +70,12 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var orders = await unitOfWork.Orders.FindAsync(o =>
+                var orders = await _orderRepository.FindAsync(o =>
                     o.Status == OrderStatus.Pending ||
                     o.Status == OrderStatus.Preparing ||
                     o.Status == OrderStatus.Ready);
 
-                var orderDtos = mapper.Map<List<OrderDto>>(orders);
+                var orderDtos = _mapper.Map<List<OrderDto>>(orders);
                 return ResponseDto<List<OrderDto>>.SuccessResponse(orderDtos);
             }
             catch (Exception ex)
@@ -82,66 +88,37 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var table = await unitOfWork.Tables.GetByIdAsync(dto.TableId);
-                if (table == null)
-                    return ResponseDto<OrderDto>.FailureResponse("Table not found");
-
-                if (table.Status != TableStatus.Available)
-                    return ResponseDto<OrderDto>.FailureResponse("Table is not available");
-
-                var user = await unitOfWork.Users.GetByIdAsync(dto.UserId);
-                if (user == null)
-                    return ResponseDto<OrderDto>.FailureResponse("User not found");
+                await _unitOfWork.BeginTransactionAsync();
 
                 var order = new Order
                 {
                     TableId = dto.TableId,
                     UserId = dto.UserId,
-                    OrderNumber = GenerateOrderNumber(),
-                    OrderDate = DateTime.UtcNow,
-                    Status = OrderStatus.Pending,
                     Notes = dto.Notes,
-                    CreatedAt = DateTime.UtcNow
+                    OrderItems = dto.Items.Select(i => new OrderItem
+                    {
+                        MenuItemId = i.MenuItemId,
+                        Quantity = i.Quantity,
+                        SpecialRequest = i.SpecialRequest
+                    }).ToList()
                 };
 
-                foreach (var itemDto in dto.Items)
-                {
-                    var menuItem = await unitOfWork.MenuItems.GetByIdAsync(itemDto.MenuItemId);
-                    if (menuItem == null)
-                        return ResponseDto<OrderDto>.FailureResponse($"Menu item {itemDto.MenuItemId} not found");
+                await _orderRepository.AddAsync(order);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
 
-                    if (!menuItem.IsAvailable)
-                        return ResponseDto<OrderDto>.FailureResponse($"Menu item {menuItem.Name} is not available");
+                var createdOrder = await _orderRepository.GetByIdAsync(order.Id);
+                var orderDto = _mapper.Map<OrderDto>(createdOrder);
 
-                    var orderItem = new OrderItem
-                    {
-                        MenuItemId = menuItem.Id,
-                        Quantity = itemDto.Quantity,
-                        UnitPrice = menuItem.Price,
-                        Subtotal = menuItem.Price * itemDto.Quantity,
-                        SpecialRequest = itemDto.SpecialRequest,
-                        CreatedAt = DateTime.UtcNow
-                    };
-
-                    order.OrderItems.Add(orderItem);
-                }
-
-                order.Subtotal = order.OrderItems.Sum(oi => oi.Subtotal);
-                order.Tax = order.Subtotal * 0.14m;
-                order.TotalAmount = order.Subtotal + order.Tax;
-
-                table.Status = TableStatus.Occupied;
-                table.UpdatedAt = DateTime.UtcNow;
-
-                await unitOfWork.Orders.AddAsync(order);
-                await unitOfWork.Tables.UpdateAsync(table);
-                await unitOfWork.SaveChangesAsync();
-
-                var orderDto = mapper.Map<OrderDto>(order);
                 return ResponseDto<OrderDto>.SuccessResponse(orderDto, "Order created successfully");
             }
             catch (Exception ex)
             {
+                try
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                }
+                catch { }
                 return ResponseDto<OrderDto>.FailureResponse($"Error: {ex.Message}");
             }
         }
@@ -150,33 +127,20 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var order = await unitOfWork.Orders.GetByIdAsync(orderId);
+                var order = await _orderRepository.GetByIdAsync(orderId);
                 if (order == null)
                     return ResponseDto<OrderDto>.FailureResponse("Order not found");
 
                 var newStatus = Enum.Parse<OrderStatus>(dto.Status);
-
-                if (!IsValidStatusTransition(order.Status, newStatus))
-                    return ResponseDto<OrderDto>.FailureResponse($"Cannot change status from {order.Status} to {newStatus}");
-
                 order.Status = newStatus;
                 order.UpdatedAt = DateTime.UtcNow;
 
-                if (newStatus == OrderStatus.Served)
-                {
-                    var table = await unitOfWork.Tables.GetByIdAsync(order.TableId);
-                    if (table != null)
-                    {
-                        table.Status = TableStatus.Available;
-                        table.UpdatedAt = DateTime.UtcNow;
-                        await unitOfWork.Tables.UpdateAsync(table);
-                    }
-                }
+                await _orderRepository.UpdateAsync(order);
+                await _unitOfWork.SaveChangesAsync();
 
-                await unitOfWork.Orders.UpdateAsync(order);
-                await unitOfWork.SaveChangesAsync();
+                var updatedOrder = await _orderRepository.GetByIdAsync(orderId);
+                var orderDto = _mapper.Map<OrderDto>(updatedOrder);
 
-                var orderDto = mapper.Map<OrderDto>(order);
                 return ResponseDto<OrderDto>.SuccessResponse(orderDto, "Order status updated successfully");
             }
             catch (Exception ex)
@@ -185,58 +149,45 @@ namespace RestaurantManageSystem.Application.Services
             }
         }
 
-        public async Task<ResponseDto<bool>> CancelOrderAsync(int orderId)
+        public async Task<ResponseDto<bool>> CancelOrderAsync(int orderId, string? reason = null)
         {
             try
             {
-                var order = await unitOfWork.Orders.GetByIdAsync(orderId);
+                await _unitOfWork.BeginTransactionAsync();
+
+                var order = await _orderRepository.GetByIdAsync(orderId);
                 if (order == null)
-                    return ResponseDto<bool>.FailureResponse("Order not found");
-
-                if (order.Status == OrderStatus.Served)
-                    return ResponseDto<bool>.FailureResponse("Cannot cancel a served order");
-
-                order.Status = OrderStatus.Cancelled;
-                order.UpdatedAt = DateTime.UtcNow;
-
-                var table = await unitOfWork.Tables.GetByIdAsync(order.TableId);
-                if (table != null)
                 {
-                    table.Status = TableStatus.Available;
-                    table.UpdatedAt = DateTime.UtcNow;
-                    await unitOfWork.Tables.UpdateAsync(table);
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return ResponseDto<bool>.FailureResponse("Order not found");
                 }
 
-                await unitOfWork.Orders.UpdateAsync(order);
-                await unitOfWork.SaveChangesAsync();
+                if (order.Status == OrderStatus.Served || order.Status == OrderStatus.Cancelled)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return ResponseDto<bool>.FailureResponse($"Cannot cancel order with status: {order.Status}");
+                }
+
+                order.Status = OrderStatus.Cancelled;
+                order.CancelledAt = DateTime.UtcNow;
+                order.CancellationReason = reason;
+                order.UpdatedAt = DateTime.UtcNow;
+
+                await _orderRepository.UpdateAsync(order);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
 
                 return ResponseDto<bool>.SuccessResponse(true, "Order cancelled successfully");
             }
             catch (Exception ex)
             {
+                try
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                }
+                catch { }
                 return ResponseDto<bool>.FailureResponse($"Error: {ex.Message}");
             }
-        }
-
-        private static string GenerateOrderNumber()
-        {
-            var date = DateTime.UtcNow;
-            var random = new Random().Next(1000, 9999);
-            return $"ORD-{date:yyyyMMdd}-{random}";
-        }
-
-        private static bool IsValidStatusTransition(OrderStatus current, OrderStatus next)
-        {
-            return (current, next) switch
-            {
-                (OrderStatus.Pending, OrderStatus.Preparing) => true,
-                (OrderStatus.Pending, OrderStatus.Cancelled) => true,
-                (OrderStatus.Preparing, OrderStatus.Ready) => true,
-                (OrderStatus.Preparing, OrderStatus.Cancelled) => true,
-                (OrderStatus.Ready, OrderStatus.Served) => true,
-                (OrderStatus.Ready, OrderStatus.Cancelled) => true,
-                _ => false
-            };
         }
     }
 }

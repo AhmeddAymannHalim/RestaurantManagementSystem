@@ -11,6 +11,6 @@ namespace RestaurantManageSystem.Application.Interfaces
         Task<ResponseDto<List<OrderDto>>> GetActiveOrdersAsync();
         Task<ResponseDto<OrderDto>> CreateOrderAsync(CreateOrderDto dto);
         Task<ResponseDto<OrderDto>> UpdateOrderStatusAsync(int orderId, UpdateOrderStatusDto dto);
-        Task<ResponseDto<bool>> CancelOrderAsync(int orderId);
+        Task<ResponseDto<bool>> CancelOrderAsync(int orderId, string? reason = null);
     }
 }

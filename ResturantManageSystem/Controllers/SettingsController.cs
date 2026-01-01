@@ -7,6 +7,7 @@ using RestaurantManageSystem.Application.DTOs;
 using RestaurantManageSystem.Application.DTOs.Common;
 using RestaurantManageSystem.Application.DTOs.Setting;
 using RestaurantManageSystem.Application.Interfaces;
+using Asp.Versioning;
 
 namespace ResturantManageSystem.API.Controllers
 {
@@ -17,7 +18,16 @@ namespace ResturantManageSystem.API.Controllers
     {
         private readonly IEmailService _emailService = emailService;
 
+        /// <summary>
+        /// Get email settings
+        /// </summary>
+        /// <returns>Email configuration settings</returns>
         [HttpGet("email")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ResponseDto<EmailSettingsResponseDto>>> GetEmailSettings()
         {
             try
@@ -50,7 +60,17 @@ namespace ResturantManageSystem.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Update email settings
+        /// </summary>
+        /// <param name="dto">Email settings to update</param>
+        /// <returns>Update result</returns>
         [HttpPost("email")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ResponseDto<bool>>> UpdateEmailSettings([FromBody] EmailSettingsDto dto)
         {
             try
@@ -105,7 +125,17 @@ namespace ResturantManageSystem.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Send a test email to verify settings
+        /// </summary>
+        /// <param name="dto">Test email address</param>
+        /// <returns>Test result</returns>
         [HttpPost("email/test")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ResponseDto<bool>>> TestEmailSettings([FromBody] TestEmailDto dto)
         {
             try
