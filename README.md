@@ -302,29 +302,6 @@ The code is intentionally readable and well-organized. Comments explain why, not
 
 Someone learning .NET can read this codebase and understand how pieces fit together. An experienced developer can use it as a reference for implementing similar patterns.
 
-## Future Enhancements
-
-Potential additions for extended functionality:
-
-**Payment Integration** - Connect with Stripe, PayPal, or Square for credit card processing and split bills
-
-**Kitchen Display System** - Dedicated screen for kitchen staff showing active orders, preparation times, and priorities
-
-**Reservation Management** - Allow customers to book tables online with capacity checks and automatic confirmations
-
-**Inventory Tracking** - Monitor ingredient stock levels, set reorder points, and track waste
-
-**Analytics Dashboard** - Visualize sales trends, popular items, peak hours, and staff performance
-
-**Mobile Application** - Native iOS/Android app for on-the-go management and customer ordering
-
-**WebSocket Integration** - Real-time bidirectional updates without polling for instant synchronization
-
-**Multi-Restaurant Support** - Extend database schema to handle multiple restaurant locations from one system
-
-## Contributing
-
-Contributions are welcome! Whether fixing bugs, adding features, or improving documentation, your help makes this project better.
 
 ### Guidelines
 
