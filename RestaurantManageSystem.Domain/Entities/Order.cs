@@ -14,6 +14,8 @@ namespace RestaurantManageSystem.Domain.Entities
         public decimal Tax { get; set; }
         public decimal TotalAmount { get; set; }
         public string? Notes { get; set; }
+        public DateTime? CancelledAt { get; set; }
+        public string? CancellationReason { get; set; }
 
         public Table Table { get; set; }
         public User User { get; set; }

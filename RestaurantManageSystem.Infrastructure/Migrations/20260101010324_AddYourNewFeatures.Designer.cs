@@ -12,8 +12,8 @@ using RestaurantManageSystem.Infrastructure.Data;
 namespace RestaurantManageSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251230062141_ImplementedSettingAndForgetPasswordAndResetPassword")]
-    partial class ImplementedSettingAndForgetPasswordAndResetPassword
+    [Migration("20260101010324_AddYourNewFeatures")]
+    partial class AddYourNewFeatures
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,66 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Entity")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("EntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IPAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Action");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Entity");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuditLogs");
+                });
 
             modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.Category", b =>
                 {
@@ -66,6 +126,54 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories", (string)null);
+                });
+
+            modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.EmailSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<bool>("EnableSSL")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FromEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("SmtpPort")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SmtpServer")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailSettings", (string)null);
                 });
 
             modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.MenuItem", b =>
@@ -136,6 +244,12 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CancellationReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -249,6 +363,41 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                     b.ToTable("OrderItems", (string)null);
                 });
 
+            modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.PasswordResetToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
             modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.Setting", b =>
                 {
                     b.Property<int>("Id")
@@ -276,15 +425,17 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("Key");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Value");
 
                     b.HasKey("Id");
 
@@ -298,55 +449,50 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         {
                             Id = 1,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 6, 21, 40, 484, DateTimeKind.Utc).AddTicks(6798),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2376),
                             Description = "SMTP Server Address",
-                            IsActive = true,
+                            IsActive = false,
                             Key = "Email.SmtpServer",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = "smtp.gmail.com"
                         },
                         new
                         {
                             Id = 2,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 6, 21, 40, 484, DateTimeKind.Utc).AddTicks(6801),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2377),
                             Description = "SMTP Port Number",
-                            IsActive = true,
+                            IsActive = false,
                             Key = "Email.SmtpPort",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = "587"
                         },
                         new
                         {
                             Id = 3,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 6, 21, 40, 484, DateTimeKind.Utc).AddTicks(6803),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2379),
                             Description = "Sender Email Address",
-                            IsActive = true,
+                            IsActive = false,
                             Key = "Email.FromEmail",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = "noreply@restaurant.com"
                         },
                         new
                         {
                             Id = 4,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 6, 21, 40, 484, DateTimeKind.Utc).AddTicks(6804),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2380),
                             Description = "Email Account Password (App Password for Gmail)",
-                            IsActive = true,
+                            IsActive = false,
                             Key = "Email.Password",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = ""
                         },
                         new
                         {
                             Id = 5,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 6, 21, 40, 484, DateTimeKind.Utc).AddTicks(6805),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2381),
                             Description = "Enable SSL for SMTP",
-                            IsActive = true,
+                            IsActive = false,
                             Key = "Email.EnableSsl",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = "true"
                         });
                 });
@@ -448,6 +594,16 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.AuditLog", b =>
+                {
+                    b.HasOne("RestaurantManageSystem.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.MenuItem", b =>

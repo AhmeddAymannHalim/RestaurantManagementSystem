@@ -22,6 +22,66 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Entity")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("EntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IPAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Action");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Entity");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -181,6 +241,12 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CancellationReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -380,7 +446,7 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         {
                             Id = 1,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 13, 33, 4, 385, DateTimeKind.Utc).AddTicks(3737),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2376),
                             Description = "SMTP Server Address",
                             IsActive = false,
                             Key = "Email.SmtpServer",
@@ -390,7 +456,7 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         {
                             Id = 2,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 13, 33, 4, 385, DateTimeKind.Utc).AddTicks(3738),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2377),
                             Description = "SMTP Port Number",
                             IsActive = false,
                             Key = "Email.SmtpPort",
@@ -400,7 +466,7 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         {
                             Id = 3,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 13, 33, 4, 385, DateTimeKind.Utc).AddTicks(3740),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2379),
                             Description = "Sender Email Address",
                             IsActive = false,
                             Key = "Email.FromEmail",
@@ -410,7 +476,7 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         {
                             Id = 4,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 13, 33, 4, 385, DateTimeKind.Utc).AddTicks(3741),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2380),
                             Description = "Email Account Password (App Password for Gmail)",
                             IsActive = false,
                             Key = "Email.Password",
@@ -420,7 +486,7 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         {
                             Id = 5,
                             Category = "Email",
-                            CreatedAt = new DateTime(2025, 12, 30, 13, 33, 4, 385, DateTimeKind.Utc).AddTicks(3742),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 3, 24, 503, DateTimeKind.Utc).AddTicks(2381),
                             Description = "Enable SSL for SMTP",
                             IsActive = false,
                             Key = "Email.EnableSsl",
@@ -525,6 +591,16 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.AuditLog", b =>
+                {
+                    b.HasOne("RestaurantManageSystem.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.MenuItem", b =>

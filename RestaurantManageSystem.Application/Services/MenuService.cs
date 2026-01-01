@@ -7,16 +7,33 @@ using RestaurantManageSystem.Domain.Entities;
 
 namespace RestaurantManageSystem.Application.Services
 {
-    public class MenuService(IUnitOfWork unitOfWork, IMapper mapper) : IMenuService
+    public class MenuService : IMenuService
     {
+        private readonly IRepository<Category> _categoryRepository;
+        private readonly IRepository<MenuItem> _menuItemRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+
+        public MenuService(
+            IRepository<Category> categoryRepository,
+            IRepository<MenuItem> menuItemRepository,
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
+        {
+            _categoryRepository = categoryRepository;
+            _menuItemRepository = menuItemRepository;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
         #region Categories
 
         public async Task<ResponseDto<List<CategoryDto>>> GetAllCategoriesAsync()
         {
             try
             {
-                var categories = await unitOfWork.Categories.GetAllAsync();
-                var categoryDtos = mapper.Map<List<CategoryDto>>(categories);
+                var categories = await _categoryRepository.GetAllAsync();
+                var categoryDtos = _mapper.Map<List<CategoryDto>>(categories);
                 return ResponseDto<List<CategoryDto>>.SuccessResponse(categoryDtos);
             }
             catch (Exception ex)
@@ -29,11 +46,11 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var category = await unitOfWork.Categories.GetByIdAsync(id);
+                var category = await _categoryRepository.GetByIdAsync(id);
                 if (category == null)
                     return ResponseDto<CategoryDto>.FailureResponse("Category not found");
 
-                var categoryDto = mapper.Map<CategoryDto>(category);
+                var categoryDto = _mapper.Map<CategoryDto>(category);
                 return ResponseDto<CategoryDto>.SuccessResponse(categoryDto);
             }
             catch (Exception ex)
@@ -46,14 +63,13 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var category = mapper.Map<Category>(dto);
-                category.CreatedAt = DateTime.UtcNow;
-                category.IsActive = true;
+                var category = _mapper.Map<Category>(dto);
+                await _categoryRepository.AddAsync(category);
+                await _unitOfWork.SaveChangesAsync();
 
-                await unitOfWork.Categories.AddAsync(category);
-                await unitOfWork.SaveChangesAsync();
+                var createdCategory = await _categoryRepository.GetByIdAsync(category.Id);
+                var categoryDto = _mapper.Map<CategoryDto>(createdCategory);
 
-                var categoryDto = mapper.Map<CategoryDto>(category);
                 return ResponseDto<CategoryDto>.SuccessResponse(categoryDto, "Category created successfully");
             }
             catch (Exception ex)
@@ -66,17 +82,19 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var category = await unitOfWork.Categories.GetByIdAsync(id);
+                var category = await _categoryRepository.GetByIdAsync(id);
                 if (category == null)
                     return ResponseDto<CategoryDto>.FailureResponse("Category not found");
 
-                mapper.Map(dto, category);
-                category.UpdatedAt = DateTime.UtcNow;
+                _mapper.Map(dto, category);
+                category.Id = id;
 
-                await unitOfWork.Categories.UpdateAsync(category);
-                await unitOfWork.SaveChangesAsync();
+                await _categoryRepository.UpdateAsync(category);
+                await _unitOfWork.SaveChangesAsync();
 
-                var categoryDto = mapper.Map<CategoryDto>(category);
+                var updatedCategory = await _categoryRepository.GetByIdAsync(id);
+                var categoryDto = _mapper.Map<CategoryDto>(updatedCategory);
+
                 return ResponseDto<CategoryDto>.SuccessResponse(categoryDto, "Category updated successfully");
             }
             catch (Exception ex)
@@ -89,17 +107,8 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var category = await unitOfWork.Categories.GetByIdAsync(id);
-                if (category == null)
-                    return ResponseDto<bool>.FailureResponse("Category not found");
-
-                // Check if category has menu items
-                var menuItems = await unitOfWork.MenuItems.FindAsync(m => m.CategoryId == id);
-                if (menuItems.Any())
-                    return ResponseDto<bool>.FailureResponse("Cannot delete category with existing menu items");
-
-                await unitOfWork.Categories.DeleteAsync(id);
-                await unitOfWork.SaveChangesAsync();
+                await _categoryRepository.DeleteAsync(id);
+                await _unitOfWork.SaveChangesAsync();
 
                 return ResponseDto<bool>.SuccessResponse(true, "Category deleted successfully");
             }
@@ -117,25 +126,25 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                IEnumerable<MenuItem> menuItems;
+                IEnumerable<MenuItem> items;
 
                 if (categoryId.HasValue)
                 {
-                    menuItems = await unitOfWork.MenuItems.FindAsync(m => m.CategoryId == categoryId.Value);
+                    items = await _menuItemRepository.FindAsync(m => m.CategoryId == categoryId.Value);
                 }
                 else
                 {
-                    menuItems = await unitOfWork.MenuItems.GetAllAsync();
+                    items = await _menuItemRepository.GetAllAsync();
                 }
 
-                var totalRecords = menuItems.Count();
-                var items = menuItems
+                var totalRecords = items.Count();
+                var paginatedItems = items
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
 
-                var menuItemDtos = mapper.Map<List<MenuItemDto>>(items);
-                var result = PaginatedResultDto<MenuItemDto>.Create(menuItemDtos, page, pageSize, totalRecords);
+                var itemDtos = _mapper.Map<List<MenuItemDto>>(paginatedItems);
+                var result = PaginatedResultDto<MenuItemDto>.Create(itemDtos, page, pageSize, totalRecords);
 
                 return ResponseDto<PaginatedResultDto<MenuItemDto>>.SuccessResponse(result);
             }
@@ -149,12 +158,12 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var menuItem = await unitOfWork.MenuItems.GetByIdAsync(id);
-                if (menuItem == null)
+                var item = await _menuItemRepository.GetByIdAsync(id);
+                if (item == null)
                     return ResponseDto<MenuItemDto>.FailureResponse("Menu item not found");
 
-                var menuItemDto = mapper.Map<MenuItemDto>(menuItem);
-                return ResponseDto<MenuItemDto>.SuccessResponse(menuItemDto);
+                var itemDto = _mapper.Map<MenuItemDto>(item);
+                return ResponseDto<MenuItemDto>.SuccessResponse(itemDto);
             }
             catch (Exception ex)
             {
@@ -166,20 +175,14 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var category = await unitOfWork.Categories.GetByIdAsync(dto.CategoryId);
-                if (category == null)
-                    return ResponseDto<MenuItemDto>.FailureResponse("Category not found");
+                var item = _mapper.Map<MenuItem>(dto);
+                await _menuItemRepository.AddAsync(item);
+                await _unitOfWork.SaveChangesAsync();
 
-                var menuItem = mapper.Map<MenuItem>(dto);
-                menuItem.CreatedAt = DateTime.UtcNow;
-                menuItem.IsActive = true;
-                menuItem.IsAvailable = true;
+                var createdItem = await _menuItemRepository.GetByIdAsync(item.Id);
+                var itemDto = _mapper.Map<MenuItemDto>(createdItem);
 
-                await unitOfWork.MenuItems.AddAsync(menuItem);
-                await unitOfWork.SaveChangesAsync();
-
-                var menuItemDto = mapper.Map<MenuItemDto>(menuItem);
-                return ResponseDto<MenuItemDto>.SuccessResponse(menuItemDto, "Menu item created successfully");
+                return ResponseDto<MenuItemDto>.SuccessResponse(itemDto, "Menu item created successfully");
             }
             catch (Exception ex)
             {
@@ -191,22 +194,20 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var menuItem = await unitOfWork.MenuItems.GetByIdAsync(id);
-                if (menuItem == null)
+                var item = await _menuItemRepository.GetByIdAsync(id);
+                if (item == null)
                     return ResponseDto<MenuItemDto>.FailureResponse("Menu item not found");
 
-                var category = await unitOfWork.Categories.GetByIdAsync(dto.CategoryId);
-                if (category == null)
-                    return ResponseDto<MenuItemDto>.FailureResponse("Category not found");
+                _mapper.Map(dto, item);
+                item.Id = id;
 
-                mapper.Map(dto, menuItem);
-                menuItem.UpdatedAt = DateTime.UtcNow;
+                await _menuItemRepository.UpdateAsync(item);
+                await _unitOfWork.SaveChangesAsync();
 
-                await unitOfWork.MenuItems.UpdateAsync(menuItem);
-                await unitOfWork.SaveChangesAsync();
+                var updatedItem = await _menuItemRepository.GetByIdAsync(id);
+                var itemDto = _mapper.Map<MenuItemDto>(updatedItem);
 
-                var menuItemDto = mapper.Map<MenuItemDto>(menuItem);
-                return ResponseDto<MenuItemDto>.SuccessResponse(menuItemDto, "Menu item updated successfully");
+                return ResponseDto<MenuItemDto>.SuccessResponse(itemDto, "Menu item updated successfully");
             }
             catch (Exception ex)
             {
@@ -218,21 +219,8 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var menuItem = await unitOfWork.MenuItems.GetByIdAsync(id);
-                if (menuItem == null)
-                    return ResponseDto<bool>.FailureResponse("Menu item not found");
-
-                // Check if has orders
-                var orderItems = await unitOfWork.OrderItems.FindAsync(oi => oi.MenuItemId == id);
-
-                if (orderItems.Any())
-                {
-                    return ResponseDto<bool>.FailureResponse(
-                        "Cannot delete menu item that has been ordered. Please remove it from all orders first.");
-                }
-
-                await unitOfWork.MenuItems.DeleteAsync(id);
-                await unitOfWork.SaveChangesAsync();
+                await _menuItemRepository.DeleteAsync(id);
+                await _unitOfWork.SaveChangesAsync();
 
                 return ResponseDto<bool>.SuccessResponse(true, "Menu item deleted successfully");
             }
@@ -242,22 +230,22 @@ namespace RestaurantManageSystem.Application.Services
             }
         }
 
+        // ✅ FIXED: Now returns Task<ResponseDto<bool>>
         public async Task<ResponseDto<bool>> ToggleAvailabilityAsync(int id)
         {
             try
             {
-                var menuItem = await unitOfWork.MenuItems.GetByIdAsync(id);
-                if (menuItem == null)
+                var item = await _menuItemRepository.GetByIdAsync(id);
+                if (item == null)
                     return ResponseDto<bool>.FailureResponse("Menu item not found");
 
-                menuItem.IsAvailable = !menuItem.IsAvailable;
-                menuItem.UpdatedAt = DateTime.UtcNow;
+                item.IsAvailable = !item.IsAvailable;
+                item.UpdatedAt = DateTime.UtcNow;
 
-                await unitOfWork.MenuItems.UpdateAsync(menuItem);
-                await unitOfWork.SaveChangesAsync();
+                await _menuItemRepository.UpdateAsync(item);
+                await _unitOfWork.SaveChangesAsync();
 
-                return ResponseDto<bool>.SuccessResponse(true,
-                    $"Menu item is now {(menuItem.IsAvailable ? "available" : "unavailable")}");
+                return ResponseDto<bool>.SuccessResponse(true, $"Availability toggled successfully. Item is now {(item.IsAvailable ? "available" : "unavailable")}");
             }
             catch (Exception ex)
             {

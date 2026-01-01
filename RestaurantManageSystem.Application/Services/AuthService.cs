@@ -6,7 +6,7 @@ using RestaurantManageSystem.Domain.Enums;
 
 namespace RestaurantManageSystem.Application.Services
 {
-    public class AuthService(IUnitOfWork unitOfWork, IJwtTokenService jwtTokenService) : IAuthService
+    public class AuthService(IUnitOfWork unitOfWork, IJwtTokenService jwtTokenService, IEmailService emailService) : IAuthService
     {
         public async Task<ResponseDto<LoginResponseDto>> LoginAsync(LoginRequestDto request)
         {
@@ -72,7 +72,7 @@ namespace RestaurantManageSystem.Application.Services
                 await unitOfWork.SaveChangesAsync();
 
                 var token = jwtTokenService.GenerateToken(user);
-                var expiresAt = DateTime.UtcNow.AddHours(12);
+                var expiresAt = DateTime.UtcNow.AddMinutes(60);
 
                 var response = new LoginResponseDto
                 {
@@ -114,6 +114,83 @@ namespace RestaurantManageSystem.Application.Services
             catch (Exception ex)
             {
                 return ResponseDto<bool>.FailureResponse($"Password change failed: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDto<bool>> ForgotPasswordAsync(ForgotPasswordRequestDto request)
+        {
+            try
+            {
+                var users = await unitOfWork.Users.FindAsync(u => u.Email == request.Email);
+                var user = users.FirstOrDefault();
+
+                if (user == null)
+                {
+                    return ResponseDto<bool>.SuccessResponse(true, "If email exists, OTP has been sent");
+                }
+
+                var otp = new Random().Next(100000, 999999).ToString();
+                var expiryTime = DateTime.UtcNow.AddMinutes(10);
+
+                var resetToken = new PasswordResetToken
+                {
+                    UserId = user.Id,
+                    Token = otp,
+                    ExpiresAt = expiryTime,
+                    CreatedAt = DateTime.UtcNow,
+                    IsUsed = false
+                };
+
+                await unitOfWork.PasswordResetTokens.AddAsync(resetToken);
+                await unitOfWork.SaveChangesAsync();
+
+                var emailSent = await emailService.SendOtpEmailAsync(request.Email, otp);
+
+                if (!emailSent)
+                {
+                    return ResponseDto<bool>.FailureResponse("Failed to send OTP. Please check email settings.");
+                }
+
+                return ResponseDto<bool>.SuccessResponse(true, "OTP sent to your email");
+            }
+            catch (Exception ex)
+            {
+                return ResponseDto<bool>.FailureResponse($"Forgot password failed: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDto<bool>> ResetPasswordAsync(ResetPasswordRequestDto request)
+        {
+            try
+            {
+                var resetTokens = await unitOfWork.PasswordResetTokens.FindAsync(t =>
+                    t.Token == request.Otp && !t.IsUsed && t.ExpiresAt > DateTime.UtcNow);
+
+                var resetToken = resetTokens.FirstOrDefault();
+                if (resetToken == null)
+                {
+                    return ResponseDto<bool>.FailureResponse("Invalid or expired OTP");
+                }
+
+                var user = await unitOfWork.Users.GetByIdAsync(resetToken.UserId);
+                if (user == null)
+                {
+                    return ResponseDto<bool>.FailureResponse("User not found");
+                }
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+                user.UpdatedAt = DateTime.UtcNow;
+                resetToken.IsUsed = true;
+
+                await unitOfWork.Users.UpdateAsync(user);
+                await unitOfWork.PasswordResetTokens.UpdateAsync(resetToken);
+                await unitOfWork.SaveChangesAsync();
+
+                return ResponseDto<bool>.SuccessResponse(true, "Password reset successfully");
+            }
+            catch (Exception ex)
+            {
+                return ResponseDto<bool>.FailureResponse($"Password reset failed: {ex.Message}");
             }
         }
     }

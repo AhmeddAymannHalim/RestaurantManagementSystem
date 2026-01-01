@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrontEnd", "FrontEnd", "{BA
 		README.md = README.md
 		styles.css = styles.css
 		translations.js = translations.js
+		Validation.js = Validation.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "local", "local", "{20FD5BEE-E84D-41E7-B389-D1DDD35557F7}"

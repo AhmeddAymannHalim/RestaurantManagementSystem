@@ -8,5 +8,7 @@ namespace RestaurantManageSystem.Application.Interfaces
         Task<ResponseDto<LoginResponseDto>> LoginAsync(LoginRequestDto request);
         Task<ResponseDto<LoginResponseDto>> RegisterAsync(RegisterRequestDto request);
         Task<ResponseDto<bool>> ChangePasswordAsync(int userId, string oldPassword, string newPassword);
+        Task<ResponseDto<bool>> ForgotPasswordAsync(ForgotPasswordRequestDto request);
+        Task<ResponseDto<bool>> ResetPasswordAsync(ResetPasswordRequestDto request);
     }
 }

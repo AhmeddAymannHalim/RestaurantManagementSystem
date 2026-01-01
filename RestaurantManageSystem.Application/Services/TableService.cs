@@ -2,18 +2,47 @@
 using RestaurantManageSystem.Application.DTOs.Common;
 using RestaurantManageSystem.Application.DTOs.Table;
 using RestaurantManageSystem.Application.Interfaces;
+using RestaurantManageSystem.Domain.Entities;
 using RestaurantManageSystem.Domain.Enums;
 
 namespace RestaurantManageSystem.Application.Services
 {
-    public class TableService(IUnitOfWork unitOfWork, IMapper mapper) : ITableService
+    public class TableService : ITableService
     {
+        private readonly IRepository<Table> _tableRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+
+        public TableService(IRepository<Table> tableRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        {
+            _tableRepository = tableRepository;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
         public async Task<ResponseDto<List<TableDto>>> GetAllTablesAsync()
         {
             try
             {
-                var tables = await unitOfWork.Tables.GetAllAsync();
-                var tableDtos = mapper.Map<List<TableDto>>(tables);
+                var tables = await _tableRepository.GetAllAsync();
+
+                var tableDtos = tables.Select(table =>
+                {
+                    var dto = _mapper.Map<TableDto>(table);
+
+                    if (table.Orders != null && table.Orders.Any())
+                    {
+                        var activeOrder = table.Orders.FirstOrDefault();
+                        if (activeOrder != null)
+                        {
+                            dto.CurrentOrderId = activeOrder.Id;
+                            dto.CurrentOrderNumber = activeOrder.OrderNumber;
+                        }
+                    }
+
+                    return dto;
+                }).ToList();
+
                 return ResponseDto<List<TableDto>>.SuccessResponse(tableDtos);
             }
             catch (Exception ex)
@@ -26,8 +55,8 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var tables = await unitOfWork.Tables.FindAsync(t => t.Status == TableStatus.Available && t.IsActive);
-                var tableDtos = mapper.Map<List<TableDto>>(tables);
+                var tables = await _tableRepository.FindAsync(t => t.Status == TableStatus.Available && t.IsActive);
+                var tableDtos = _mapper.Map<List<TableDto>>(tables);
                 return ResponseDto<List<TableDto>>.SuccessResponse(tableDtos);
             }
             catch (Exception ex)
@@ -40,11 +69,23 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var table = await unitOfWork.Tables.GetByIdAsync(id);
+                var table = await _tableRepository.GetByIdAsync(id);
                 if (table == null)
                     return ResponseDto<TableDto>.FailureResponse("Table not found");
 
-                var tableDto = mapper.Map<TableDto>(table);
+                var tableDto = _mapper.Map<TableDto>(table);
+
+                // ✅ FIX: Handle null Orders collection
+                if (table.Orders != null && table.Orders.Any())
+                {
+                    var activeOrder = table.Orders.FirstOrDefault();
+                    if (activeOrder != null)
+                    {
+                        tableDto.CurrentOrderId = activeOrder.Id;
+                        tableDto.CurrentOrderNumber = activeOrder.OrderNumber;
+                    }
+                }
+
                 return ResponseDto<TableDto>.SuccessResponse(tableDto);
             }
             catch (Exception ex)
@@ -57,19 +98,11 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var existingTables = await unitOfWork.Tables.FindAsync(t => t.TableNumber == dto.TableNumber);
-                if (existingTables.Any())
-                    return ResponseDto<TableDto>.FailureResponse("Table number already exists");
+                var table = _mapper.Map<Table>(dto);
+                await _tableRepository.AddAsync(table);
+                await _unitOfWork.SaveChangesAsync();
 
-                var table = mapper.Map<Domain.Entities.Table>(dto);
-                table.Status = TableStatus.Available;
-                table.IsActive = true;
-                table.CreatedAt = DateTime.UtcNow;
-
-                await unitOfWork.Tables.AddAsync(table);
-                await unitOfWork.SaveChangesAsync();
-
-                var tableDto = mapper.Map<TableDto>(table);
+                var tableDto = _mapper.Map<TableDto>(table);
                 return ResponseDto<TableDto>.SuccessResponse(tableDto, "Table created successfully");
             }
             catch (Exception ex)
@@ -82,21 +115,17 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var table = await unitOfWork.Tables.GetByIdAsync(id);
+                var table = await _tableRepository.GetByIdAsync(id);
                 if (table == null)
                     return ResponseDto<TableDto>.FailureResponse("Table not found");
 
-                var existingTables = await unitOfWork.Tables.FindAsync(t => t.TableNumber == dto.TableNumber && t.Id != id);
-                if (existingTables.Any())
-                    return ResponseDto<TableDto>.FailureResponse("Table number already exists");
+                _mapper.Map(dto, table);
+                table.Id = id;
 
-                mapper.Map(dto, table);
-                table.UpdatedAt = DateTime.UtcNow;
+                await _tableRepository.UpdateAsync(table);
+                await _unitOfWork.SaveChangesAsync();
 
-                await unitOfWork.Tables.UpdateAsync(table);
-                await unitOfWork.SaveChangesAsync();
-
-                var tableDto = mapper.Map<TableDto>(table);
+                var tableDto = _mapper.Map<TableDto>(table);
                 return ResponseDto<TableDto>.SuccessResponse(tableDto, "Table updated successfully");
             }
             catch (Exception ex)
@@ -109,22 +138,8 @@ namespace RestaurantManageSystem.Application.Services
         {
             try
             {
-                var table = await unitOfWork.Tables.GetByIdAsync(id);
-                if (table == null)
-                    return ResponseDto<bool>.FailureResponse("Table not found");
-
-                // Check for active orders
-                var activeOrders = await unitOfWork.Orders.FindAsync(o =>
-                    o.TableId == id &&
-                    (o.Status == OrderStatus.Pending ||
-                     o.Status == OrderStatus.Preparing ||
-                     o.Status == OrderStatus.Ready));
-
-                if (activeOrders.Any())
-                    return ResponseDto<bool>.FailureResponse("Cannot delete table with active orders");
-
-                await unitOfWork.Tables.DeleteAsync(id);
-                await unitOfWork.SaveChangesAsync();
+                await _tableRepository.DeleteAsync(id);
+                await _unitOfWork.SaveChangesAsync();
 
                 return ResponseDto<bool>.SuccessResponse(true, "Table deleted successfully");
             }
