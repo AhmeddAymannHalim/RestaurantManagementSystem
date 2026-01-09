@@ -1,6 +1,4 @@
 ﻿// FILE: Infrastructure/Data/AppDbContext.cs
-// LOCATION: RestaurantManageSystem.Infrastructure/Data/AppDbContext.cs
-
 using Microsoft.EntityFrameworkCore;
 using RestaurantManageSystem.Domain.Entities;
 using System.Reflection;
@@ -28,12 +26,14 @@ namespace RestaurantManageSystem.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Apply all configurations from assembly
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+            // EmailSettings configuration
             modelBuilder.Entity<EmailSettings>(entity =>
             {
                 entity.ToTable("EmailSettings");
-
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.SmtpServer)
@@ -56,6 +56,27 @@ namespace RestaurantManageSystem.Infrastructure.Data
 
                 entity.Property(e => e.UpdatedAt)
                     .HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<PasswordResetToken>(entity =>
+            {
+                entity.ToTable("PasswordResetTokens");
+
+                entity.Property(e => e.Token)
+                    .IsRequired()
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.CreatedAt)
+                    .IsRequired();
+
+                entity.Property(e => e.ExpiresAt)
+                    .IsRequired();
+
+                entity.Property(e => e.IsUsed)
+                    .IsRequired()
+                    .HasDefaultValue(false);
+
+        
             });
         }
     }

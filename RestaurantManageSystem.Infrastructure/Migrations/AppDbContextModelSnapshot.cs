@@ -79,7 +79,7 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.Category", b =>
@@ -392,7 +392,7 @@ namespace RestaurantManageSystem.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PasswordResetTokens");
+                    b.ToTable("PasswordResetTokens", (string)null);
                 });
 
             modelBuilder.Entity("RestaurantManageSystem.Domain.Entities.Setting", b =>
