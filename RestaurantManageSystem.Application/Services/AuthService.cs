@@ -130,7 +130,7 @@ namespace RestaurantManageSystem.Application.Services
                 }
 
                 var otp = new Random().Next(100000, 999999).ToString();
-                var expiryTime = DateTime.UtcNow.AddMinutes(10);
+                var expiryTime = DateTime.UtcNow.AddHours(1);
 
                 var resetToken = new PasswordResetToken
                 {
